@@ -1,0 +1,6 @@
+
+{
+  "name": "Thumbify - Création de Miniatures YouTube",
+  "description": "Une application de vitrine et de gestion de commandes pour un service de création de miniatures YouTube, offrant des packs uniques et des abonnements premium. Conçu avec React, Tailwind CSS, et intégré avec Gemini pour l'assistance créative.",
+  "requestFramePermissions": []
+}
