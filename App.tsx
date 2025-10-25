@@ -4,7 +4,6 @@ import { HashRouter, Routes, Route, Outlet, Link, useParams, useNavigate, Naviga
 import { AppProvider, useAppContext } from './contexts';
 import { Header, Footer, PortfolioGrid, PricingCard } from './components';
 import { PRICING_PACKS, PORTFOLIO_ITEMS } from './constants';
-import { generateThumbnailIdeas } from './services/geminiService';
 import type { Order, OrderBrief, PortfolioItem } from './types';
 
 
@@ -145,10 +144,6 @@ const OrderPage: React.FC = () => {
     const { addOrder } = useAppContext();
     const navigate = useNavigate();
     const [brief, setBrief] = useState<OrderBrief>({ videoTitle: '', styleInspiration: '', keyElements: '', notes: '', files: [] });
-    const [ideaTopic, setIdeaTopic] = useState('');
-    const [ideas, setIdeas] = useState('');
-    const [isLoadingIdeas, setIsLoadingIdeas] = useState(false);
-
 
     if (!pack) return <div className="text-center py-20">Pack non trouvé.</div>;
 
@@ -167,23 +162,14 @@ const OrderPage: React.FC = () => {
         addOrder(pack, brief);
         navigate('/confirmation');
     }
-
-    const handleGetIdeas = async () => {
-        if (!ideaTopic) return;
-        setIsLoadingIdeas(true);
-        setIdeas('');
-        const result = await generateThumbnailIdeas(ideaTopic);
-        setIdeas(result);
-        setIsLoadingIdeas(false);
-    }
     
     return (
         <div className="container mx-auto px-6 py-12">
             <h1 className="text-4xl font-black mb-2">Brief de Commande</h1>
             <p className="text-xl text-brand-yellow mb-8">Vous avez sélectionné : {pack.title}</p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                <form onSubmit={handleSubmit} className="lg:col-span-2 bg-gray-900 p-8 rounded-lg border border-gray-800 space-y-6">
+            <div className="max-w-3xl mx-auto">
+                <form onSubmit={handleSubmit} className="bg-gray-900 p-8 rounded-lg border border-gray-800 space-y-6">
                     <div>
                         <label htmlFor="videoTitle" className="block text-sm font-medium text-gray-300 mb-1">Titre / Sujet de la vidéo</label>
                         <input type="text" name="videoTitle" id="videoTitle" onChange={handleBriefChange} className="w-full bg-gray-800 border-gray-700 rounded-md p-2 focus:ring-brand-yellow focus:border-brand-yellow" required />
@@ -206,20 +192,6 @@ const OrderPage: React.FC = () => {
                     </div>
                     <button type="submit" className="w-full bg-brand-red text-white font-bold py-3 rounded-lg text-lg hover:bg-opacity-80 transition-all">Valider la Commande (€{pack.price})</button>
                 </form>
-
-                <div className="bg-gray-900 p-8 rounded-lg border border-gray-800 h-fit">
-                    <h3 className="text-xl font-bold mb-4 text-brand-yellow">Besoin d'idées ?</h3>
-                    <p className="text-gray-400 mb-4 text-sm">Utilisez notre assistant IA pour trouver des concepts pour votre miniature.</p>
-                    <input type="text" value={ideaTopic} onChange={e => setIdeaTopic(e.target.value)} placeholder="Le sujet de votre vidéo..." className="w-full bg-gray-800 border-gray-700 rounded-md p-2 mb-4 focus:ring-brand-yellow focus:border-brand-yellow" />
-                    <button onClick={handleGetIdeas} disabled={isLoadingIdeas} className="w-full bg-brand-yellow text-brand-dark font-bold py-2 rounded-lg hover:bg-opacity-80 disabled:bg-gray-600 disabled:cursor-not-allowed">
-                        {isLoadingIdeas ? 'Génération en cours...' : 'Obtenir des idées'}
-                    </button>
-                    {ideas && (
-                        <div className="mt-4 p-4 bg-gray-800 rounded-md whitespace-pre-wrap text-sm text-gray-200 max-h-96 overflow-y-auto">
-                            {ideas}
-                        </div>
-                    )}
-                </div>
             </div>
         </div>
     );
